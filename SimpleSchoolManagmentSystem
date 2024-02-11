@@ -1,0 +1,355 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.ArrayList;
+
+class Person {
+    protected String name;
+    protected int id;
+
+    public Person(String name, int id) {
+        this.name = name;
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getId() {
+        return id;
+    }
+}
+
+class Student extends Person {
+    private String department;
+    private int semester;
+    private int totalFees;
+    private int leftFees;
+    private int lastPaidAmount;
+
+    public Student(String name, int id, String department, int semester, int totalFees) {
+        super(name, id);
+        this.department = department;
+        this.semester = semester;
+        this.totalFees = totalFees;
+        this.leftFees = totalFees;
+        this.lastPaidAmount = 0;
+    }
+
+    public void payFees(int amount) {
+        if (amount <= leftFees) {
+            leftFees -= amount;
+            lastPaidAmount = amount;
+            System.out.println("Fees paid successfully.");
+        } else {
+            System.out.println("Insufficient amount. Please enter a valid amount.");
+        }
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public int getSemester() {
+        return semester;
+    }
+
+    public int getTotalFees() {
+        return totalFees;
+    }
+
+    public int getLeftFees() {
+        return leftFees;
+    }
+
+    public int getLastPaidAmount() {
+        return lastPaidAmount;
+    }
+}
+
+class Teacher extends Person {
+    private String department;
+    private int totalSalary;
+    private int remainingSalary;
+    private int paidSalary;
+
+    public Teacher(String name, int id, String department, int totalSalary) {
+        super(name, id);
+        this.department = department;
+        this.totalSalary = totalSalary;
+        this.remainingSalary = totalSalary;
+        this.paidSalary = 0;
+    }
+
+    public void receivePayment(int amount) {
+        if (amount <= remainingSalary) {
+            remainingSalary -= amount;
+            paidSalary += amount;
+            System.out.println("Payment received successfully.");
+        } else {
+            System.out.println("Insufficient amount. Please enter a valid amount.");
+        }
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public int getTotalSalary() {
+        return totalSalary;
+    }
+
+    public int getRemainingSalary() {
+        return remainingSalary;
+    }
+
+    public int getPaidSalary() {
+        return paidSalary;
+    }
+}
+
+class School {
+    private ArrayList<Student> students;
+    private ArrayList<Teacher> teachers;
+    private int totalEarnedMoney;
+    private int totalSpendMoney;
+    private final String adminPassword = "admin123";
+
+    public School() {
+        this.students = new ArrayList<>();
+        this.teachers = new ArrayList<>();
+        this.totalEarnedMoney = 0;
+        this.totalSpendMoney = 0;
+
+        // Adding specific students with names
+        students.add(new Student("Basu", 41, "Computer Science and Engineering", 3, 100000));
+        students.add(new Student("Hari", 42, "Computer Science and Engineering", 3, 100000));
+        students.add(new Student("Shivashankar", 43, "Computer Science and Engineering", 3, 100000));
+
+        // Adding specific teachers with names
+        teachers.add(new Teacher("John Doe", 101, "Computer Science and Engineering", 8000));
+        teachers.add(new Teacher("Jane Doe", 102, "Computer Science and Engineering", 7500));
+    }
+
+    public ArrayList<Student> getStudents() {
+        return students;
+    }
+
+    public ArrayList<Teacher> getTeachers() {
+        return teachers;
+    }
+
+    public int getTotalEarnedMoney() {
+        return totalEarnedMoney;
+    }
+
+    public int getTotalSpendMoney() {
+        return totalSpendMoney;
+    }
+
+    public String getAdminPassword() {
+        return adminPassword;
+    }
+
+    // Method to get student by ID
+    public Student getStudentById(int id) {
+        for (Student student : students) {
+            if (student.getId() == id) {
+                return student;
+            }
+        }
+        return null; // Return null if student with given ID is not found
+    }
+
+    // Method to get teacher by ID
+    public Teacher getTeacherById(int id) {
+        for (Teacher teacher : teachers) {
+            if (teacher.getId() == id) {
+                return teacher;
+            }
+        }
+        return null; // Return null if teacher with given ID is not found
+    }
+}
+
+public class main{
+    private static School school;
+    private static JFrame mainFrame;
+
+    public static void main(String[] args) {
+        school = new School();
+        prepareGUI();
+    }
+
+    private static void prepareGUI() {
+        mainFrame = new JFrame("School Management System");
+        mainFrame.setSize(400, 300);
+        mainFrame.setLayout(new GridLayout(4, 1));
+        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        JLabel headerLabel = new JLabel("", JLabel.CENTER);
+        JLabel statusLabel = new JLabel("", JLabel.CENTER);
+        statusLabel.setSize(350, 100);
+
+        JPanel controlPanel = new JPanel();
+        controlPanel.setLayout(new FlowLayout());
+
+        JButton studentButton = new JButton("Student Details");
+        JButton teacherButton = new JButton("Teacher Details");
+        JButton adminButton = new JButton("School Details (Admin Access)");
+        JButton websiteButton = new JButton("Visit School Website");
+
+        studentButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                displayStudentDetails();
+            }
+        });
+
+        teacherButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String teacherId = JOptionPane.showInputDialog(mainFrame, "Enter Teacher ID:");
+                if (teacherId != null) {
+                    try {
+                        int id = Integer.parseInt(teacherId);
+                        displayTeacherDetails(id);
+                    } catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(mainFrame, "Invalid Teacher ID", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+        });
+
+        adminButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String password = JOptionPane.showInputDialog(mainFrame, "Enter Admin Password:");
+                if (password != null && password.equals(school.getAdminPassword())) {
+                    displaySchoolDetails();
+                } else {
+                    JOptionPane.showMessageDialog(mainFrame, "Invalid Password", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        websiteButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                openSchoolWebsite();
+            }
+        });
+
+        controlPanel.add(studentButton);
+        controlPanel.add(teacherButton);
+        controlPanel.add(adminButton);
+        controlPanel.add(websiteButton);
+
+        mainFrame.add(headerLabel);
+        mainFrame.add(controlPanel);
+        mainFrame.add(statusLabel);
+        mainFrame.setVisible(true);
+    }
+
+    private static void displayStudentDetails() {
+        String studentId = JOptionPane.showInputDialog(mainFrame, "Enter Student ID:");
+        if (studentId != null) {
+            try {
+                int id = Integer.parseInt(studentId);
+                Student student = school.getStudentById(id);
+                if (student != null) {
+                    JFrame studentFrame = new JFrame("Student Details");
+                    studentFrame.setSize(400, 300);
+                    studentFrame.setLayout(new GridLayout(4, 2));
+
+                    JLabel nameLabel = new JLabel("Name:");
+                    JLabel idLabel = new JLabel("ID:");
+                    JLabel departmentLabel = new JLabel("Department:");
+                    JLabel totalFeesLabel = new JLabel("Total Fees:");
+
+                    JLabel nameValueLabel = new JLabel(student.getName());
+                    JLabel idValueLabel = new JLabel(String.valueOf(student.getId()));
+                    JLabel departmentValueLabel = new JLabel(student.getDepartment());
+                    JLabel totalFeesValueLabel = new JLabel(String.valueOf(student.getTotalFees()));
+
+                    studentFrame.add(nameLabel);
+                    studentFrame.add(nameValueLabel);
+                    studentFrame.add(idLabel);
+                    studentFrame.add(idValueLabel);
+                    studentFrame.add(departmentLabel);
+                    studentFrame.add(departmentValueLabel);
+                    studentFrame.add(totalFeesLabel);
+                    studentFrame.add(totalFeesValueLabel);
+
+                    studentFrame.setVisible(true);
+                } else {
+                    JOptionPane.showMessageDialog(mainFrame, "Student Not Found", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(mainFrame, "Invalid Student ID", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private static void displayTeacherDetails(int id) {
+        Teacher teacher = school.getTeacherById(id);
+        if (teacher != null) {
+            JFrame teacherFrame = new JFrame("Teacher Details");
+            teacherFrame.setSize(400, 300);
+            teacherFrame.setLayout(new GridLayout(4, 2));
+
+            JLabel nameLabel = new JLabel("Name:");
+            JLabel idLabel = new JLabel("ID:");
+            JLabel departmentLabel = new JLabel("Department:");
+            JLabel totalSalaryLabel = new JLabel("Total Salary:");
+
+            JLabel nameValueLabel = new JLabel(teacher.getName());
+            JLabel idValueLabel = new JLabel(String.valueOf(teacher.getId()));
+            JLabel departmentValueLabel = new JLabel(teacher.getDepartment());
+            JLabel totalSalaryValueLabel = new JLabel(String.valueOf(teacher.getTotalSalary()));
+
+            teacherFrame.add(nameLabel);
+            teacherFrame.add(nameValueLabel);
+            teacherFrame.add(idLabel);
+            teacherFrame.add(idValueLabel);
+            teacherFrame.add(departmentLabel);
+            teacherFrame.add(departmentValueLabel);
+            teacherFrame.add(totalSalaryLabel);
+            teacherFrame.add(totalSalaryValueLabel);
+
+            teacherFrame.setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(mainFrame, "Teacher Not Found", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private static void displaySchoolDetails() {
+        JFrame schoolFrame = new JFrame("School Details");
+        schoolFrame.setSize(400, 300);
+        schoolFrame.setLayout(new GridLayout(4, 2));
+
+        JLabel totalEarnedLabel = new JLabel("Total Earned Money:");
+        JLabel totalSpendLabel = new JLabel("Total Spend Money:");
+        JLabel adminPasswordLabel = new JLabel("Admin Password:");
+
+        JLabel totalEarnedValueLabel = new JLabel(String.valueOf(school.getTotalEarnedMoney()));
+        JLabel totalSpendValueLabel = new JLabel(String.valueOf(school.getTotalSpendMoney()));
+        JLabel adminPasswordValueLabel = new JLabel(school.getAdminPassword());
+
+        schoolFrame.add(totalEarnedLabel);
+        schoolFrame.add(totalEarnedValueLabel);
+        schoolFrame.add(totalSpendLabel);
+        schoolFrame.add(totalSpendValueLabel);
+        schoolFrame.add(adminPasswordLabel);
+        schoolFrame.add(adminPasswordValueLabel);
+
+        schoolFrame.setVisible(true);
+    }
+
+    private static void openSchoolWebsite() {
+        // Open the school website in the default browser
+        String url = "http://www.msrit.edu";
+        try {
+            Desktop.getDesktop().browse(java.net.URI.create(url));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+}
